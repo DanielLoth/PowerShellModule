@@ -15,6 +15,7 @@ function Show-HelloWorld {
     Example 1x
     #>
 
+    [CmdletBinding(SupportsShouldProcess=$true)]
     param (
         $a = "test"
     )
