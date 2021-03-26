@@ -1,8 +1,12 @@
 Set-StrictMode -Version Latest
 
 function Show-GoodMorning {
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact = "High")]
+    param (
+        
+    )
+
     Write-Host "Good morning"
-    Get-IISSite
 }
 
 # Export-ModuleMember -Function Show-GoodMorning
