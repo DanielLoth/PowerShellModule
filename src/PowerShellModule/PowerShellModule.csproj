@@ -11,8 +11,17 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="PowerShellModule.psd1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="PowerShellModule.psm1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="pwsh &quot;$(SolutionDir)postbuild.ps1&quot; -ConfigurationName $(ConfigurationName) -ProjectName $(ProjectName) -ProjectFileName $(ProjectFileName) -ProjectPath $(ProjectPath) -SolutionDir $(SolutionDir) -SolutionFileName $(SolutionFileName) -SolutionPath $(SolutionPath) -TargetFileName $(TargetFileName) -TargetName $(TargetName) -TargetPath $(TargetPath)" />
+    <Exec Command="pwsh &quot;$(SolutionDir)postbuild.ps1&quot; -ConfigurationName $(ConfigurationName) -ProjectName $(ProjectName) -ProjectFileName $(ProjectFileName) -ProjectPath $(ProjectPath) -SolutionDir $(SolutionDir) -SolutionFileName $(SolutionFileName) -SolutionPath $(SolutionPath) -TargetDir $(TargetDir) -TargetFileName $(TargetFileName) -TargetName $(TargetName) -TargetPath $(TargetPath)" />
   </Target>
 
 </Project>

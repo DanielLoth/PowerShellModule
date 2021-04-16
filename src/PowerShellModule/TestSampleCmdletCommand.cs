@@ -72,6 +72,6 @@ namespace PowerShellModule
     {
         public int FavoriteNumber { get; set; }
         public string FavoritePet { get; set; }
-        public string Hi { get; set; } = "Hidd!";
+        public string Hi { get; set; } = "Hi ddd!";
     }
 }
