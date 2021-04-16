@@ -9,8 +9,8 @@
 @{
 
     # Script module or binary module file associated with this manifest.
-    # RootModule        = 'PowerShellModule.dll'
-    RootModule = 'PowerShellModule.dll'
+    # RootModule        = 'CSharpModule.dll'
+    RootModule = 'CSharpModule.dll'
 
     # Version number of this module.
     ModuleVersion     = '0.0.1'

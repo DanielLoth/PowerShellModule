@@ -1,9 +1,7 @@
-﻿using System;
-using System.Management.Automation;
-using System.Management.Automation.Runspaces;
+﻿using System.Management.Automation;
 using System.Threading;
 
-namespace PowerShellModule
+namespace CSharpModule
 {
     [Cmdlet(VerbsDiagnostic.Test,"SampleCmdlet")]
     [OutputType(typeof(FavoriteStuff))]
@@ -33,7 +31,7 @@ namespace PowerShellModule
             WriteProgress(progress);
 
             WriteVerbose("Begin!");
-            Thread.Sleep(100);
+            //Thread.Sleep(100);
         }
 
         // This method will be called for each input received from the pipeline to this cmdlet; if no input is received, this method is not called
@@ -51,7 +49,7 @@ namespace PowerShellModule
 
             WriteProgress(progress);
 
-            Thread.Sleep(100);
+            //Thread.Sleep(100);
         }
 
         // This method will be called once at the end of pipeline execution; if no input is received, this method is not called
@@ -72,6 +70,6 @@ namespace PowerShellModule
     {
         public int FavoriteNumber { get; set; }
         public string FavoritePet { get; set; }
-        public string Hi { get; set; } = "Hi ddd!";
+        public string Hi { get; set; } = "Hi :)!";
     }
 }
