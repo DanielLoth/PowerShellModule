@@ -11,4 +11,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="pwsh &quot;$(SolutionDir)postbuild.ps1&quot; -ConfigurationName $(ConfigurationName) -ProjectName $(ProjectName) -ProjectFileName $(ProjectFileName) -ProjectPath $(ProjectPath) -SolutionDir $(SolutionDir) -SolutionFileName $(SolutionFileName) -SolutionPath $(SolutionPath) -TargetFileName $(TargetFileName) -TargetName $(TargetName) -TargetPath $(TargetPath)" />
+  </Target>
+
 </Project>

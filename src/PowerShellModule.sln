@@ -5,6 +5,12 @@ VisualStudioVersion = 16.0.31105.61
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PowerShellModule", "PowerShellModule\PowerShellModule.csproj", "{EBA52079-4F27-45D4-A265-8C6274F92EFE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FD1A071A-10B5-437C-BC9D-E7E5ADD562F7}"
+	ProjectSection(SolutionItems) = preProject
+		postbuild.ps1 = postbuild.ps1
+		prebuild.ps1 = prebuild.ps1
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
