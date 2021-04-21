@@ -70,6 +70,6 @@ namespace CSharpModule
     {
         public int FavoriteNumber { get; set; }
         public string FavoritePet { get; set; }
-        public string Hi { get; set; } = "Hi :)!";
+        public string Hi { get; set; } = "Hi :::)!";
     }
 }
