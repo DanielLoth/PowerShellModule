@@ -30,13 +30,13 @@ namespace CSharpModule
 
         protected override void ProcessRecord()
         {
-            var procedureQuery = @"
+            var procedureQuery = @$"
                 select
-                    object_schema_name(p.object_id) as SchemaName
-                    , p.object_id as ObjectId
-                    , p.name as ProcedureName
-                    , p.type as TypeCode
-                    , p.type_desc as TypeDescription
+                    object_schema_name(p.object_id) as {nameof(Procedure.SchemaName)}
+                    , p.object_id as {nameof(Procedure.ObjectId)}
+                    , p.name as {nameof(Procedure.ProcedureName)}
+                    , p.type as {nameof(Procedure.ObjectTypeCode)}
+                    , p.type_desc as {nameof(Procedure.ObjectTypeDescription)}
                 from sys.procedures p
                 where p.is_ms_shipped = 0
                 order by object_schema_name(p.object_id), p.name;";
@@ -45,13 +45,13 @@ namespace CSharpModule
                                          .AsList()
                                          .ToDictionary(procedure => procedure.ObjectId);
 
-            var tableQuery = @"
+            var tableQuery = @$"
                 select
-                    object_schema_name(t.object_id) as SchemaName 
-                    , t.object_id as ObjectId
-                    , t.name as TableName
-                    , t.type as TypeCode
-                    , t.type_desc as TypeDescription
+                    object_schema_name(t.object_id) as {nameof(Table.SchemaName)}
+                    , t.object_id as {nameof(Table.ObjectId)}
+                    , t.name as {nameof(Table.TableName)}
+                    , t.type as {nameof(Table.ObjectTypeCode)}
+                    , t.type_desc as {nameof(Table.ObjectTypeDescription)}
                 from sys.tables t
                 where t.is_ms_shipped = 0
                 order by object_schema_name(t.object_id), t.name;";
@@ -60,20 +60,20 @@ namespace CSharpModule
                                      .AsList()
                                      .ToDictionary(table => table.ObjectId);
 
-            var typeQuery = @"
+            var typeQuery = @$"
                 select
-                    schema_name(t.schema_id) as SchemaName 
-                    , t.name as TypeName
-                    , t.system_type_id as SystemTypeId
-                    , t.user_type_id as UserTypeId
-                    , t.max_length as MaxLength
-                    , t.precision as Precision
-                    , t.scale as Scale
-                    , t.collation_name as CollationName
-                    , t.is_nullable as IsNullable
-                    , t.is_user_defined as IsUserDefined
-                    , t.is_assembly_type as IsAssemblyType
-                    , t.is_table_type as IsTableType
+                    schema_name(t.schema_id) as {nameof(SqlType.SchemaName)}
+                    , t.name as {nameof(SqlType.TypeName)}
+                    , t.system_type_id as {nameof(SqlType.SystemTypeId)}
+                    , t.user_type_id as {nameof(SqlType.UserTypeId)}
+                    , t.max_length as {nameof(SqlType.MaxLength)}
+                    , t.precision as {nameof(SqlType.Precision)}
+                    , t.scale as {nameof(SqlType.Scale)}
+                    , t.collation_name as {nameof(SqlType.CollationName)}
+                    , t.is_nullable as {nameof(SqlType.IsNullable)}
+                    , t.is_user_defined as {nameof(SqlType.IsUserDefined)}
+                    , t.is_assembly_type as {nameof(SqlType.IsAssemblyType)}
+                    , t.is_table_type as {nameof(SqlType.IsTableType)}
                 from sys.types t
                 order by schema_name(t.schema_id), t.name;";
 
@@ -81,13 +81,35 @@ namespace CSharpModule
                                     .AsList()
                                     .ToDictionary(type => TypeKey.GetTypeKey(type));
 
-            var viewQuery = @"
+            var tableTypeQuery = @$"
                 select
-                    object_schema_name(v.object_id) as SchemaName
-                    , v.object_id as ObjectId
-                    , v.name as ViewName
-                    , v.type as TypeCode
-                    , v.type_desc as TypeDescription
+                    schema_name(t.schema_id) as {nameof(TableType.SchemaName)}
+                    , t.type_table_object_id as {nameof(TableType.ObjectId)}
+                    , t.name as {nameof(TableType.TableTypeName)}
+                    , t.system_type_id as {nameof(TableType.SystemTypeId)}
+                    , t.user_type_id as {nameof(TableType.UserTypeId)}
+                    , t.max_length as {nameof(TableType.MaxLength)}
+                    , t.precision as {nameof(TableType.Precision)}
+                    , t.scale as {nameof(TableType.Scale)}
+                    , t.collation_name as {nameof(TableType.CollationName)}
+                    , t.is_nullable as {nameof(TableType.IsNullable)}
+                    , t.is_user_defined as {nameof(TableType.IsUserDefined)}
+                    , t.is_assembly_type as {nameof(TableType.IsAssemblyType)}
+                    , t.is_memory_optimize as {nameof(TableType.IsMemoryOptimized)}
+                from sys.table_types t
+                order by schema_name(t.schema_id), t.name;";
+
+            var tableTypeMap = connection.Query<TableType>(tableTypeQuery)
+                                         .AsList()
+                                         .ToDictionary(type => TypeKey.GetTypeKey(type));
+
+            var viewQuery = @$"
+                select
+                    object_schema_name(v.object_id) as {nameof(View.SchemaName)}
+                    , v.object_id as {nameof(View.ObjectId)}
+                    , v.name as {nameof(View.ViewName)}
+                    , v.type as {nameof(View.ObjectTypeCode)}
+                    , v.type_desc as {nameof(View.ObjectTypeDescription)}
                 from sys.views v
                 where v.is_ms_shipped = 0
                 order by object_schema_name(v.object_id), v.name;";
@@ -96,25 +118,25 @@ namespace CSharpModule
                                     .AsList()
                                     .ToDictionary(view => view.ObjectId);
 
-            var columnQuery = @"
+            var columnQuery = @$"
                 select
-                    o.object_id as ParentObjectId
-                    , object_schema_name(o.object_id) as ParentSchemaName
-                    , o.name as ParentName
-                    , o.type as ParentTypeCode
-                    , o.type_desc as ParentTypeDescription
-                    , c.column_id as ColumnId
-                    , c.name as ColumnName
-                    , c.system_type_id as SystemTypeId
-                    , c.user_type_id as UserTypeId
-                    , c.max_length as MaxLength
-                    , c.precision as Precision
-                    , c.scale as Scale
-                    , c.collation_name as CollationName
-                    , columnproperty(c.object_id, c.name, 'charmaxlen') as MaxCharacterLength
-                    , c.is_nullable as IsNullable
-                    , c.is_identity as IsIdentity
-                    , c.is_computed as IsComputed
+                    o.object_id as {nameof(Column.ParentObjectId)}
+                    , object_schema_name(o.object_id) as {nameof(Column.ParentSchemaName)}
+                    , o.name as {nameof(Column.ParentName)}
+                    , o.type as {nameof(Column.ParentObjectTypeCode)}
+                    , o.type_desc as {nameof(Column.ParentObjectTypeDescription)}
+                    , c.column_id as {nameof(Column.ColumnId)}
+                    , c.name as {nameof(Column.ColumnName)}
+                    , c.system_type_id as {nameof(Column.SystemTypeId)}
+                    , c.user_type_id as {nameof(Column.UserTypeId)}
+                    , c.max_length as {nameof(Column.MaxLength)}
+                    , c.precision as {nameof(Column.Precision)}
+                    , c.scale as {nameof(Column.Scale)}
+                    , c.collation_name as {nameof(Column.CollationName)}
+                    , columnproperty(c.object_id, c.name, 'charmaxlen') as {nameof(Column.MaxCharacterLength)}
+                    , c.is_nullable as {nameof(Column.IsNullable)}
+                    , c.is_identity as {nameof(Column.IsIdentity)}
+                    , c.is_computed as {nameof(Column.IsComputed)}
                 from sys.columns c
                 inner join sys.objects o on o.object_id = c.object_id
                 where o.is_ms_shipped = 0
@@ -125,13 +147,24 @@ namespace CSharpModule
                                       .GroupBy(column => column.ParentObjectId)
                                       .ToDictionary(group => group.Key, group => group.AsList());
 
+            foreach (var type in typeMap.Values)
+            {
+                var typeKey = TypeKey.GetTypeKey(type);
+
+                if (type.IsTableType && tableTypeMap.TryGetValue(typeKey, out var tableType))
+                {
+                    type.TableType = tableType;
+                    tableType.Type = type;
+                }
+            }
+
             foreach (var column in columnMap.Values.SelectMany(c => c.AsList()))
             {
                 var typeKey = TypeKey.GetTypeKey(column);
 
                 if (typeMap.TryGetValue(typeKey, out var type))
                 {
-                    column.SqlType = type;
+                    column.Type = type;
                 }
             }
 

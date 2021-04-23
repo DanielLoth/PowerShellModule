@@ -16,6 +16,7 @@ namespace CSharpModule
         public bool IsUserDefined { get; }
         public bool IsAssemblyType { get; }
         public bool IsTableType { get; }
+        public TableType TableType { get; set; }
 
         public (string, string) Key => (SchemaName, TypeName);
         public string FullName => ObjectName.GetFullName(SchemaName, TypeName);

@@ -2,15 +2,15 @@
 
 namespace CSharpModule
 {
-    public sealed class Column : IComparable<Column>, IEquatable<Column>, IHasParentObjectTypeCode, IHasType
+    public sealed class Parameter : IComparable<Parameter>, IEquatable<Parameter>, IHasParentObjectTypeCode, IHasType
     {
         public int ParentObjectId { get; }
         public string ParentSchemaName { get; }
         public string ParentName { get; }
         public string ParentObjectTypeCode { get; }
         public string ParentObjectTypeDescription { get; }
-        public int ColumnId { get; }
-        public string ColumnName { get; }
+        public int ParameterId { get; }
+        public string ParameterName { get; }
         public int SystemTypeId { get; }
         public int UserTypeId { get; }
         public int MaxLength { get; }
@@ -24,13 +24,13 @@ namespace CSharpModule
 
         public SqlType Type { get; set; }
 
-        public (string, string, string) Key => (ParentSchemaName, ParentName, ColumnName);
-        public string FullName => ObjectName.GetFullName(ParentSchemaName, ParentName, ColumnName);
-        public string FullNameQuoted => ObjectName.GetFullNameQuoted(ParentSchemaName, ParentName, ColumnName);
+        public (string, string, string) Key => (ParentSchemaName, ParentName, ParameterName);
+        public string FullName => ObjectName.GetFullName(ParentSchemaName, ParentName, ParameterName);
+        public string FullNameQuoted => ObjectName.GetFullNameQuoted(ParentSchemaName, ParentName, ParameterName);
 
-        public int CompareTo(Column other) => Key.CompareTo(other.Key);
-        public bool Equals(Column other) => Key.Equals(other.Key);
-        public override bool Equals(object obj) => obj is Column other && Equals(other);
+        public int CompareTo(Parameter other) => Key.CompareTo(other.Key);
+        public bool Equals(Parameter other) => Key.Equals(other.Key);
+        public override bool Equals(object obj) => obj is Parameter other && Equals(other);
         public override int GetHashCode() => Key.GetHashCode();
         public override string ToString() => FullName;
     }

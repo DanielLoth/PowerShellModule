@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace CSharpModule
 {
-    public sealed class Table : IComparable<Table>, IEquatable<Table>, IHasColumns
+    public sealed class Table : IComparable<Table>, IEquatable<Table>, IHasColumns, IHasObjectTypeCode
     {
         private readonly List<Column> tableColumns = new List<Column>();
 
         public int ObjectId { get; }
         public string SchemaName { get; }
         public string TableName { get; }
-        public string TypeCode { get; }
-        public string TypeDescription { get; }
+        public string ObjectTypeCode { get; }
+        public string ObjectTypeDescription { get; }
 
         public (string, string) Key => (SchemaName, TableName);
         public string FullName => ObjectName.GetFullName(SchemaName, TableName);

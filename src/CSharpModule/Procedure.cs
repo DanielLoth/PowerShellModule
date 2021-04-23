@@ -2,13 +2,13 @@
 
 namespace CSharpModule
 {
-    public sealed class Procedure : IComparable<Procedure>, IEquatable<Procedure>
+    public sealed class Procedure : IComparable<Procedure>, IEquatable<Procedure>, IHasObjectTypeCode
     {
         public int ObjectId { get; }
         public string SchemaName { get; }
         public string ProcedureName { get; }
-        public string TypeCode { get; }
-        public string TypeDescription { get; }
+        public string ObjectTypeCode { get; }
+        public string ObjectTypeDescription { get; }
 
         public (string, string) Key => (SchemaName, ProcedureName);
         public string FullName => ObjectName.GetFullName(SchemaName, ProcedureName);
