@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Management.Automation;
 
 namespace CSharpModule
 {
@@ -24,7 +25,9 @@ namespace CSharpModule
 
         public SqlType Type { get; set; }
 
+        [Hidden]
         public (string, string, string) Key => (ParentSchemaName, ParentName, ParameterName);
+
         public string FullName => ObjectName.GetFullName(ParentSchemaName, ParentName, ParameterName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(ParentSchemaName, ParentName, ParameterName);
 

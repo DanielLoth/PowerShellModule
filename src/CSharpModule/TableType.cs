@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Management.Automation;
 
 namespace CSharpModule
 {
@@ -22,7 +23,9 @@ namespace CSharpModule
         public bool IsMemoryOptimized { get; }
         public SqlType Type { get; set; }
 
+        [Hidden]
         public (string, string) Key => (SchemaName, TableTypeName);
+
         public string FullName => ObjectName.GetFullName(SchemaName, TableTypeName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, TableTypeName);
 

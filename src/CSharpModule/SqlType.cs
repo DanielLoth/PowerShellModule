@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Management.Automation;
 
 namespace CSharpModule
 {
@@ -18,7 +19,9 @@ namespace CSharpModule
         public bool IsTableType { get; }
         public TableType TableType { get; set; }
 
+        [Hidden]
         public (string, string) Key => (SchemaName, TypeName);
+
         public string FullName => ObjectName.GetFullName(SchemaName, TypeName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, TypeName);
 

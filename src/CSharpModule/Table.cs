@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Management.Automation;
 
 namespace CSharpModule
 {
@@ -13,7 +14,9 @@ namespace CSharpModule
         public string ObjectTypeCode { get; }
         public string ObjectTypeDescription { get; }
 
+        [Hidden]
         public (string, string) Key => (SchemaName, TableName);
+
         public string FullName => ObjectName.GetFullName(SchemaName, TableName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, TableName);
 

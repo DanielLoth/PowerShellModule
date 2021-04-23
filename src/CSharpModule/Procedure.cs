@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Management.Automation;
 
 namespace CSharpModule
 {
@@ -10,7 +11,9 @@ namespace CSharpModule
         public string ObjectTypeCode { get; }
         public string ObjectTypeDescription { get; }
 
+        [Hidden]
         public (string, string) Key => (SchemaName, ProcedureName);
+
         public string FullName => ObjectName.GetFullName(SchemaName, ProcedureName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, ProcedureName);
 
