@@ -28,10 +28,14 @@ namespace CSharpModule
         [Hidden]
         public (string, string, string) Key => (ParentSchemaName, ParentName, ColumnName);
 
+        [Hidden]
+        public (string, string, int) OrdinalKey => (ParentSchemaName, ParentName, ColumnId);
+
+        public bool IsVariableLengthMax => MaxLength == -1;
         public string FullName => ObjectName.GetFullName(ParentSchemaName, ParentName, ColumnName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(ParentSchemaName, ParentName, ColumnName);
 
-        public int CompareTo(Column other) => Key.CompareTo(other.Key);
+        public int CompareTo(Column other) => OrdinalKey.CompareTo(other.OrdinalKey);
         public bool Equals(Column other) => Key.Equals(other.Key);
         public override bool Equals(object obj) => obj is Column other && Equals(other);
         public override int GetHashCode() => Key.GetHashCode();

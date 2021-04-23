@@ -22,6 +22,7 @@ namespace CSharpModule
         [Hidden]
         public (string, string) Key => (SchemaName, TypeName);
 
+        public bool IsVariableLengthMax => MaxLength == -1;
         public string FullName => ObjectName.GetFullName(SchemaName, TypeName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, TypeName);
 
