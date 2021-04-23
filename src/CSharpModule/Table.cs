@@ -22,11 +22,7 @@ namespace CSharpModule
 
         public IList<Column> Columns => tableColumns;
 
-        public void AddColumns(IEnumerable<Column> columns)
-        {
-            tableColumns.AddRange(columns);
-            tableColumns.Sort();
-        }
+        public void AddColumns(IEnumerable<Column> columns) => tableColumns.AddRangeAndSort(columns);
 
         public int CompareTo(Table other) => Key.CompareTo(other.Key);
         public bool Equals(Table other) => Key.Equals(other.Key);

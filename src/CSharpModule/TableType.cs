@@ -31,11 +31,7 @@ namespace CSharpModule
 
         public IList<Column> Columns => tableTypeColumns;
 
-        public void AddColumns(IEnumerable<Column> columns)
-        {
-            tableTypeColumns.AddRange(columns);
-            tableTypeColumns.Sort();
-        }
+        public void AddColumns(IEnumerable<Column> columns) => tableTypeColumns.AddRangeAndSort(columns);
 
         public int CompareTo(TableType other) => Key.CompareTo(other.Key);
         public bool Equals(TableType other) => Key.Equals(other.Key);
