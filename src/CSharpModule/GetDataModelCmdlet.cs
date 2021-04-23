@@ -95,7 +95,7 @@ namespace CSharpModule
                     , t.is_nullable as {nameof(TableType.IsNullable)}
                     , t.is_user_defined as {nameof(TableType.IsUserDefined)}
                     , t.is_assembly_type as {nameof(TableType.IsAssemblyType)}
-                    , t.is_memory_optimize as {nameof(TableType.IsMemoryOptimized)}
+                    , t.is_memory_optimized as {nameof(TableType.IsMemoryOptimized)}
                 from sys.table_types t
                 order by schema_name(t.schema_id), t.name;";
 
