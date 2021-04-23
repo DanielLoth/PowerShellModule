@@ -31,6 +31,7 @@ namespace CSharpModule
             var metadata = new SqlMetadata
             {
                 Columns = GetColumns(),
+                Parameters = GetParameters(),
                 Procedures = GetProcedures(),
                 Types = GetTypes(),
                 Tables = GetTables(),
@@ -68,6 +69,32 @@ namespace CSharpModule
                 order by object_schema_name(o.object_id), o.name, c.column_id;";
 
             return Get<Column>(columnQuery);
+        }
+
+        private List<Parameter> GetParameters()
+        {
+            var parameterQuery = $@"
+                select
+                    o.object_id as {nameof(Parameter.ParentObjectId)}
+                    , object_schema_name(o.object_id) as {nameof(Parameter.ParentSchemaName)}
+                    , o.name as {nameof(Parameter.ParentName)}
+                    , o.type as {nameof(Parameter.ParentObjectTypeCode)}
+                    , o.type_desc as {nameof(Parameter.ParentObjectTypeDescription)}
+                    , p.parameter_id as {nameof(Parameter.ParameterId)}
+                    , p.name as {nameof(Parameter.ParameterName)}
+                    , p.system_type_id as {nameof(Parameter.SystemTypeId)}
+                    , p.user_type_id as {nameof(Parameter.UserTypeId)}
+                    , p.max_length as {nameof(Parameter.MaxLength)}
+                    , p.precision as {nameof(Parameter.Precision)}
+                    , p.scale as {nameof(Parameter.Scale)}
+                    , columnproperty(p.object_id, p.name, 'charmaxlen') as {nameof(Parameter.MaxCharacterLength)}
+                    , p.is_nullable as {nameof(Parameter.IsNullable)}
+                from sys.parameters p
+                inner join sys.objects o on o.object_id = p.object_id
+                where o.is_ms_shipped = 0
+                order by object_schema_name(o.object_id), o.name, p.parameter_id;";
+
+            return Get<Parameter>(parameterQuery);
         }
 
         private List<Procedure> GetProcedures()

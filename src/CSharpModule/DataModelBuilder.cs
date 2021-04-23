@@ -6,6 +6,7 @@ namespace CSharpModule
     public sealed class DataModelBuilder
     {
         private readonly Dictionary<int, List<Column>> columnMap;
+        private readonly Dictionary<int, List<Parameter>> parameterMap;
         private readonly Dictionary<int, Procedure> procedureMap;
         private readonly Dictionary<int, Table> tableMap;
         private readonly Dictionary<(int, int), SqlType> typeMap;
@@ -14,23 +15,36 @@ namespace CSharpModule
 
         public DataModelBuilder(SqlMetadata metadata)
         {
-            this.columnMap = metadata.Columns.GroupBy(column => column.ParentObjectId).ToDictionary(group => group.Key, group => group.AsList());
+            this.columnMap = metadata.Columns
+                                     .GroupBy(column => column.ParentObjectId)
+                                     .ToDictionary(group => group.Key, group => group.AsList());
+
+            this.parameterMap = metadata.Parameters
+                                        .GroupBy(parameter => parameter.ParentObjectId)
+                                        .ToDictionary(group => group.Key, group => group.AsList());
+
             this.procedureMap = metadata.Procedures.ToDictionary(procedure => procedure.ObjectId);
             this.tableMap = metadata.Tables.ToDictionary(table => table.ObjectId);
             this.typeMap = metadata.Types.ToDictionary(type => TypeKey.GetTypeKey(type));
             this.tableTypeMap = metadata.TableTypes.ToDictionary(type => TypeKey.GetTypeKey(type));
             this.viewMap = metadata.Views.ToDictionary(view => view.ObjectId);
 
-            LinkColumns();
-            LinkProcedures();
-            LinkTables();
-            LinkTypesToTableTypes();
-            LinkViews();
+            LinkObjects();
         }
 
         public DataModel ToModel()
         {
             return new DataModel(procedureMap.Values, tableMap.Values, viewMap.Values, typeMap.Values);
+        }
+
+        private void LinkObjects()
+        {
+            LinkColumns();
+            LinkParameters();
+            LinkProcedures();
+            LinkTables();
+            LinkTypesToTableTypes();
+            LinkViews();
         }
 
         private void LinkColumns()
@@ -51,9 +65,38 @@ namespace CSharpModule
             }
         }
 
+        private void LinkParameters()
+        {
+            LinkParametersToTypes();
+        }
+
+        private void LinkParametersToTypes()
+        {
+            foreach (var parameter in parameterMap.Values.SelectMany(p => p.AsList()))
+            {
+                var typeKey = TypeKey.GetTypeKey(parameter);
+
+                if (typeMap.TryGetValue(typeKey, out var type))
+                {
+                    parameter.Type = type;
+                }
+            }
+        }
+
         private void LinkProcedures()
         {
+            LinkProceduresToParameters();
+        }
 
+        private void LinkProceduresToParameters()
+        {
+            foreach (var procedure in procedureMap.Values)
+            {
+                if (parameterMap.TryGetValue(procedure.ObjectId, out var parameters))
+                {
+                    procedure.AddParameters(parameters);
+                }
+            }
         }
 
         private void LinkTables()

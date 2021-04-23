@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Management.Automation;
 
 namespace CSharpModule
 {
     public sealed class Procedure : IComparable<Procedure>, IEquatable<Procedure>, IHasObjectTypeCode
     {
+        private readonly List<Parameter> procedureParameters = new List<Parameter>();
+
         public int ObjectId { get; }
         public string SchemaName { get; }
         public string ProcedureName { get; }
@@ -16,6 +19,9 @@ namespace CSharpModule
 
         public string FullName => ObjectName.GetFullName(SchemaName, ProcedureName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, ProcedureName);
+
+        public IList<Parameter> Parameters => procedureParameters;
+        public void AddParameters(IEnumerable<Parameter> parameters) => procedureParameters.AddRangeAndSort(parameters);
 
         public int CompareTo(Procedure other) => Key.CompareTo(other.Key);
         public bool Equals(Procedure other) => Key.Equals(other.Key);
