@@ -30,9 +30,24 @@ namespace CSharpModule
 
         protected override void ProcessRecord()
         {
+            var procedureQuery = @"
+                select
+                    object_schema_name(p.object_id) as SchemaName
+                    , p.object_id as ObjectId
+                    , p.name as ProcedureName
+                    , p.type as TypeCode
+                    , p.type_desc as TypeDescription
+                from sys.procedures p
+                where p.is_ms_shipped = 0
+                order by object_schema_name(p.object_id), p.name;";
+
+            var procedureMap = connection.Query<Procedure>(procedureQuery)
+                                         .AsList()
+                                         .ToDictionary(procedure => procedure.ObjectId);
+
             var tableQuery = @"
                 select
-                    object_schema_name(t.object_id) as SchemaName
+                    object_schema_name(t.object_id) as SchemaName 
                     , t.object_id as ObjectId
                     , t.name as TableName
                     , t.type as TypeCode
@@ -45,6 +60,42 @@ namespace CSharpModule
                                      .AsList()
                                      .ToDictionary(table => table.ObjectId);
 
+            var typeQuery = @"
+                select
+                    schema_name(t.schema_id) as SchemaName 
+                    , t.name as TypeName
+                    , t.system_type_id as SystemTypeId
+                    , t.user_type_id as UserTypeId
+                    , t.max_length as MaxLength
+                    , t.precision as Precision
+                    , t.scale as Scale
+                    , t.collation_name as CollationName
+                    , t.is_nullable as IsNullable
+                    , t.is_user_defined as IsUserDefined
+                    , t.is_assembly_type as IsAssemblyType
+                    , t.is_table_type as IsTableType
+                from sys.types t
+                order by schema_name(t.schema_id), t.name;";
+
+            var typeMap = connection.Query<SqlType>(typeQuery)
+                                    .AsList()
+                                    .ToDictionary(type => TypeKey.GetTypeKey(type));
+
+            var viewQuery = @"
+                select
+                    object_schema_name(v.object_id) as SchemaName
+                    , v.object_id as ObjectId
+                    , v.name as ViewName
+                    , v.type as TypeCode
+                    , v.type_desc as TypeDescription
+                from sys.views v
+                where v.is_ms_shipped = 0
+                order by object_schema_name(v.object_id), v.name;";
+
+            var viewMap = connection.Query<View>(viewQuery)
+                                    .AsList()
+                                    .ToDictionary(view => view.ObjectId);
+
             var columnQuery = @"
                 select
                     o.object_id as ParentObjectId
@@ -54,6 +105,7 @@ namespace CSharpModule
                     , o.type_desc as ParentTypeDescription
                     , c.column_id as ColumnId
                     , c.name as ColumnName
+                    , c.system_type_id as SystemTypeId
                     , c.user_type_id as UserTypeId
                     , c.max_length as MaxLength
                     , c.precision as Precision
@@ -64,7 +116,7 @@ namespace CSharpModule
                     , c.is_identity as IsIdentity
                     , c.is_computed as IsComputed
                 from sys.columns c
-                inner join sys.tables o on o.object_id = c.object_id
+                inner join sys.objects o on o.object_id = c.object_id
                 where o.is_ms_shipped = 0
                 order by object_schema_name(o.object_id), o.name, c.column_id;";
 
@@ -72,6 +124,16 @@ namespace CSharpModule
                                       .AsList()
                                       .GroupBy(column => column.ParentObjectId)
                                       .ToDictionary(group => group.Key, group => group.AsList());
+
+            foreach (var column in columnMap.Values.SelectMany(c => c.AsList()))
+            {
+                var typeKey = TypeKey.GetTypeKey(column);
+
+                if (typeMap.TryGetValue(typeKey, out var type))
+                {
+                    column.SqlType = type;
+                }
+            }
 
             foreach (var table in tableMap.Values)
             {
@@ -81,7 +143,15 @@ namespace CSharpModule
                 }
             }
 
-            WriteObject(new DataModel(tableMap.Values));
+            foreach (var view in viewMap.Values)
+            {
+                if (columnMap.TryGetValue(view.ObjectId, out var columns))
+                {
+                    view.AddColumns(columns);
+                }
+            }
+
+            WriteObject(new DataModel(procedureMap.Values, tableMap.Values, viewMap.Values, typeMap.Values));
 
             base.ProcessRecord();
         }
