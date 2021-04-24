@@ -7,6 +7,7 @@ namespace CSharpModule
     {
         private readonly Dictionary<int, List<CheckConstraint>> checkConstraintMap;
         private readonly Dictionary<int, List<Column>> columnMap;
+        private readonly Dictionary<int, List<KeyConstraint>> keyConstraintMap;
         private readonly Dictionary<int, List<Parameter>> parameterMap;
         private readonly Dictionary<int, Procedure> procedureMap;
         private readonly Dictionary<int, Table> tableMap;
@@ -23,6 +24,10 @@ namespace CSharpModule
             this.columnMap = metadata.Columns
                                      .GroupBy(column => column.ParentObjectId)
                                      .ToDictionary(group => group.Key, group => group.AsList());
+
+            this.keyConstraintMap = metadata.KeyConstraints
+                                            .GroupBy(cc => cc.ParentObjectId)
+                                            .ToDictionary(group => group.Key, group => group.AsList());
 
             this.parameterMap = metadata.Parameters
                                         .GroupBy(parameter => parameter.ParentObjectId)
@@ -108,7 +113,7 @@ namespace CSharpModule
         private void LinkTables()
         {
             LinkTablesToColumns();
-            LinkTablesToCheckConstraints();
+            LinkTablesToConstraints();
         }
 
         private void LinkTablesToColumns()
@@ -122,13 +127,18 @@ namespace CSharpModule
             }
         }
 
-        private void LinkTablesToCheckConstraints()
+        private void LinkTablesToConstraints()
         {
             foreach (var table in tableMap.Values)
             {
                 if (checkConstraintMap.TryGetValue(table.ObjectId, out var checkConstraints))
                 {
                     table.AddCheckConstraints(checkConstraints);
+                }
+
+                if (keyConstraintMap.TryGetValue(table.ObjectId, out var keyConstraints))
+                {
+                    table.AddKeyConstraints(keyConstraints);
                 }
             }
         }

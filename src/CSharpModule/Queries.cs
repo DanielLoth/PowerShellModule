@@ -32,6 +32,7 @@ namespace CSharpModule
             {
                 CheckConstraints = GetCheckConstraints(),
                 Columns = GetColumns(),
+                KeyConstraints = GetKeyConstraints(),
                 Parameters = GetParameters(),
                 Procedures = GetProcedures(),
                 Types = GetTypes(),
@@ -99,6 +100,31 @@ namespace CSharpModule
                 order by object_schema_name(o.object_id), o.name, c.column_id;";
 
             return Get<Column>(columnQuery);
+        }
+
+        private List<KeyConstraint> GetKeyConstraints()
+        {
+            var keyConstraintQuery = $@"
+                select
+                    o.object_id as [{nameof(KeyConstraint.ParentObjectId)}]
+                    , schema_name(isnull(tt.schema_id, o.schema_id)) as [{nameof(KeyConstraint.ParentSchemaName)}]
+                    , isnull(tt.name, o.name) as [{nameof(KeyConstraint.ParentName)}]
+                    , o.type as [{nameof(KeyConstraint.ParentObjectTypeCode)}]
+                    , o.type_desc as [{nameof(KeyConstraint.ParentObjectTypeDescription)}]
+                    , kc.object_id as [{nameof(KeyConstraint.ObjectId)}]
+                    , kc.type as [{nameof(KeyConstraint.ObjectTypeCode)}]
+                    , kc.type_desc as [{nameof(KeyConstraint.ObjectTypeDescription)}]
+                    , kc.name as [{nameof(KeyConstraint.KeyConstraintName)}]
+                    , kc.unique_index_id as [{nameof(KeyConstraint.UniqueIndexId)}]
+                    , kc.is_enforced as [{nameof(KeyConstraint.IsEnforced)}]
+                    , kc.is_system_named as [{nameof(KeyConstraint.IsSystemNamed)}]
+                from sys.key_constraints kc
+                inner join sys.objects o on kc.parent_object_id = o.object_id
+                left join sys.table_types tt on kc.parent_object_id = tt.type_table_object_id
+                where kc.is_ms_shipped = 0 or (kc.is_ms_shipped = 1 and tt.is_user_defined = 1)
+                order by schema_name(isnull(tt.schema_id, o.schema_id)), isnull(tt.name, o.name), kc.name;";
+
+            return Get<KeyConstraint>(keyConstraintQuery);
         }
 
         private List<Parameter> GetParameters()

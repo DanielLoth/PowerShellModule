@@ -6,6 +6,7 @@ namespace CSharpModule
     {
         public List<CheckConstraint> CheckConstraints { get; set; }
         public List<Column> Columns { get; set; }
+        public List<KeyConstraint> KeyConstraints { get; set; }
         public List<Parameter> Parameters { get; set; }
         public List<Procedure> Procedures { get; set; }
         public List<SqlType> Types { get; set; }

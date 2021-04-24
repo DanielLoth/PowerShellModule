@@ -8,6 +8,7 @@ namespace CSharpModule
     {
         private readonly List<CheckConstraint> tableCheckConstraints = new List<CheckConstraint>();
         private readonly List<Column> tableColumns = new List<Column>();
+        private readonly List<KeyConstraint> tableKeyConstraints = new List<KeyConstraint>();
 
         public int ObjectId { get; }
         public string SchemaName { get; }
@@ -23,9 +24,11 @@ namespace CSharpModule
 
         public IList<CheckConstraint> CheckConstraints => tableCheckConstraints;
         public IList<Column> Columns => tableColumns;
+        public IList<KeyConstraint> KeyConstraints => tableKeyConstraints;
 
         public void AddCheckConstraints(IEnumerable<CheckConstraint> checkConstraints) => tableCheckConstraints.AddRangeAndSort(checkConstraints);
         public void AddColumns(IEnumerable<Column> columns) => tableColumns.AddRangeAndSort(columns);
+        public void AddKeyConstraints(IEnumerable<KeyConstraint> keyConstraints) => tableKeyConstraints.AddRangeAndSort(keyConstraints);
 
         public int CompareTo(Table other) => Key.CompareTo(other.Key);
         public bool Equals(Table other) => Key.Equals(other.Key);

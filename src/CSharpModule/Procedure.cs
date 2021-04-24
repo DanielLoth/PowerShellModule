@@ -4,7 +4,7 @@ using System.Management.Automation;
 
 namespace CSharpModule
 {
-    public sealed class Procedure : IComparable<Procedure>, IEquatable<Procedure>, IHasObjectTypeCode
+    public sealed class Procedure : IComparable<Procedure>, IEquatable<Procedure>, IHasObjectTypeCode, IHasParameters
     {
         private readonly List<Parameter> procedureParameters = new List<Parameter>();
 
