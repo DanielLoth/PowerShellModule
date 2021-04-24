@@ -6,6 +6,7 @@ namespace CSharpModule
 {
     public sealed class Table : IComparable<Table>, IEquatable<Table>, IHasColumns, IHasObjectTypeCode
     {
+        private readonly List<CheckConstraint> tableCheckConstraints = new List<CheckConstraint>();
         private readonly List<Column> tableColumns = new List<Column>();
 
         public int ObjectId { get; }
@@ -20,8 +21,10 @@ namespace CSharpModule
         public string FullName => ObjectName.GetFullName(SchemaName, TableName);
         public string FullNameQuoted => ObjectName.GetFullNameQuoted(SchemaName, TableName);
 
+        public IList<CheckConstraint> CheckConstraints => tableCheckConstraints;
         public IList<Column> Columns => tableColumns;
 
+        public void AddCheckConstraints(IEnumerable<CheckConstraint> checkConstraints) => tableCheckConstraints.AddRangeAndSort(checkConstraints);
         public void AddColumns(IEnumerable<Column> columns) => tableColumns.AddRangeAndSort(columns);
 
         public int CompareTo(Table other) => Key.CompareTo(other.Key);

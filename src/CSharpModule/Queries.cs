@@ -30,6 +30,7 @@ namespace CSharpModule
         {
             var metadata = new SqlMetadata
             {
+                CheckConstraints = GetCheckConstraints(),
                 Columns = GetColumns(),
                 Parameters = GetParameters(),
                 Procedures = GetProcedures(),
@@ -40,6 +41,34 @@ namespace CSharpModule
             };
 
             return metadata;
+        }
+
+        private List<CheckConstraint> GetCheckConstraints()
+        {
+            var checkConstraintQuery = $@"
+                select
+                    o.object_id as {nameof(CheckConstraint.ParentObjectId)}
+                    , schema_name(isnull(tt.schema_id, o.schema_id)) as {nameof(CheckConstraint.ParentSchemaName)}
+                    , isnull(tt.name, o.name) as {nameof(CheckConstraint.ParentName)}
+                    , o.type as {nameof(CheckConstraint.ParentObjectTypeCode)}
+                    , o.type_desc as {nameof(CheckConstraint.ParentObjectTypeDescription)}
+
+                    , cc.object_id as {nameof(CheckConstraint.ObjectId)}
+                    , cc.type as {nameof(CheckConstraint.ObjectTypeCode)}
+                    , cc.type_desc as {nameof(CheckConstraint.ObjectTypeDescription)}
+                    , cc.name as {nameof(CheckConstraint.CheckConstraintName)}
+                    , cc.is_disabled as {nameof(CheckConstraint.IsDisabled)}
+                    , cc.is_not_trusted as {nameof(CheckConstraint.IsNotTrusted)}
+                    , cc.parent_column_id as {nameof(CheckConstraint.ParentColumnId)}
+                    , cc.definition as {nameof(CheckConstraint.Definition)}
+                    , cc.is_system_named as {nameof(CheckConstraint.IsSystemNamed)}
+                from sys.check_constraints cc
+                inner join sys.objects o on cc.parent_object_id = o.object_id
+                left join sys.table_types tt on cc.parent_object_id = tt.type_table_object_id
+                where cc.is_ms_shipped = 0 or (cc.is_ms_shipped = 1 and tt.is_user_defined = 1)
+                order by object_schema_name(o.object_id), cc.name;";
+
+            return Get<CheckConstraint>(checkConstraintQuery);
         }
 
         private List<Column> GetColumns()

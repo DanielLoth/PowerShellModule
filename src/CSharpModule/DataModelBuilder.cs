@@ -5,6 +5,7 @@ namespace CSharpModule
 {
     public sealed class DataModelBuilder
     {
+        private readonly Dictionary<int, List<CheckConstraint>> checkConstraintMap;
         private readonly Dictionary<int, List<Column>> columnMap;
         private readonly Dictionary<int, List<Parameter>> parameterMap;
         private readonly Dictionary<int, Procedure> procedureMap;
@@ -15,6 +16,10 @@ namespace CSharpModule
 
         public DataModelBuilder(SqlMetadata metadata)
         {
+            this.checkConstraintMap = metadata.CheckConstraints
+                                              .GroupBy(cc => cc.ParentObjectId)
+                                              .ToDictionary(group => group.Key, group => group.AsList());
+
             this.columnMap = metadata.Columns
                                      .GroupBy(column => column.ParentObjectId)
                                      .ToDictionary(group => group.Key, group => group.AsList());
@@ -103,6 +108,7 @@ namespace CSharpModule
         private void LinkTables()
         {
             LinkTablesToColumns();
+            LinkTablesToCheckConstraints();
         }
 
         private void LinkTablesToColumns()
@@ -112,6 +118,17 @@ namespace CSharpModule
                 if (columnMap.TryGetValue(table.ObjectId, out var columns))
                 {
                     table.AddColumns(columns);
+                }
+            }
+        }
+
+        private void LinkTablesToCheckConstraints()
+        {
+            foreach (var table in tableMap.Values)
+            {
+                if (checkConstraintMap.TryGetValue(table.ObjectId, out var checkConstraints))
+                {
+                    table.AddCheckConstraints(checkConstraints);
                 }
             }
         }
