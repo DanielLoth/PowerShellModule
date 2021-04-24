@@ -47,8 +47,8 @@ namespace CSharpModule
             var columnQuery = @$"
                 select
                     o.object_id as {nameof(Column.ParentObjectId)}
-                    , object_schema_name(o.object_id) as {nameof(Column.ParentSchemaName)}
-                    , o.name as {nameof(Column.ParentName)}
+                    , schema_name(isnull(tt.schema_id, o.schema_id)) as {nameof(Column.ParentSchemaName)}
+                    , isnull(tt.name, o.name) as {nameof(Column.ParentName)}
                     , o.type as {nameof(Column.ParentObjectTypeCode)}
                     , o.type_desc as {nameof(Column.ParentObjectTypeDescription)}
                     , c.column_id as {nameof(Column.ColumnId)}
@@ -65,7 +65,8 @@ namespace CSharpModule
                     , c.is_computed as {nameof(Column.IsComputed)}
                 from sys.columns c
                 inner join sys.objects o on o.object_id = c.object_id
-                where o.is_ms_shipped = 0
+                    left join sys.table_types tt on tt.type_table_object_id = o.object_id and o.type = 'TT'
+                where o.is_ms_shipped = 0 or (o.is_ms_shipped = 1 and tt.is_user_defined = 1)
                 order by object_schema_name(o.object_id), o.name, c.column_id;";
 
             return Get<Column>(columnQuery);
@@ -91,7 +92,6 @@ namespace CSharpModule
                     , p.is_nullable as {nameof(Parameter.IsNullable)}
                 from sys.parameters p
                 inner join sys.objects o on o.object_id = p.object_id
-                where o.is_ms_shipped = 0
                 order by object_schema_name(o.object_id), o.name, p.parameter_id;";
 
             return Get<Parameter>(parameterQuery);

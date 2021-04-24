@@ -34,7 +34,7 @@ namespace CSharpModule
 
         public DataModel ToModel()
         {
-            return new DataModel(procedureMap.Values, tableMap.Values, viewMap.Values, typeMap.Values);
+            return new DataModel(procedureMap.Values, tableMap.Values, tableTypeMap.Values, viewMap.Values, typeMap.Values);
         }
 
         private void LinkObjects()
@@ -43,6 +43,7 @@ namespace CSharpModule
             LinkParameters();
             LinkProcedures();
             LinkTables();
+            LinkTableTypes();
             LinkTypesToTableTypes();
             LinkViews();
         }
@@ -111,6 +112,22 @@ namespace CSharpModule
                 if (columnMap.TryGetValue(table.ObjectId, out var columns))
                 {
                     table.AddColumns(columns);
+                }
+            }
+        }
+
+        private void LinkTableTypes()
+        {
+            LinkTableTypesToColumns();
+        }
+
+        private void LinkTableTypesToColumns()
+        {
+            foreach (var tableType in tableTypeMap.Values)
+            {
+                if (columnMap.TryGetValue(tableType.ObjectId, out var columns))
+                {
+                    tableType.AddColumns(columns);
                 }
             }
         }
