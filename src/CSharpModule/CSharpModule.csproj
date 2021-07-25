@@ -27,4 +27,20 @@
     <Exec Command="pwsh &quot;$(SolutionDir)postbuild.ps1&quot; -ConfigurationName $(ConfigurationName) -ProjectName $(ProjectName) -ProjectFileName $(ProjectFileName) -ProjectPath $(ProjectPath) -SolutionDir $(SolutionDir) -SolutionFileName $(SolutionFileName) -SolutionPath $(SolutionPath) -TargetDir $(TargetDir) -TargetFileName $(TargetFileName) -TargetName $(TargetName) -TargetPath $(TargetPath)" />
   </Target>
 
+  <UsingTask TaskName="MyTask" AssemblyFile="$(SolutionDir)/BuildTools/bin/Debug/net48/BuildTools.dll" />
+
+  <Target Name="TBeforeBuild" AfterTargets="PreBuildEvent">
+    <Message Text="BeforeBuild" Importance="High" />
+  </Target>
+  <Target Name="TAfterBuild" AfterTargets="PostBuildEvent">
+    <Message Text="AfterBuild" Importance="High" />
+  </Target>
+  <Target Name="TAfterBuild2" AfterTargets="PostBuildEvent">
+    <Message Text="AfterBuild2" Importance="High" />
+  </Target>
+  <Target Name="MyTask" AfterTargets="PostBuildEvent">
+    <Message Text="AfterBuild2" Importance="High" />
+    <MyTask />
+  </Target>
+
 </Project>
